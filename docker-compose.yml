@@ -1,0 +1,64 @@
+services:
+    traefik:
+        image: traefik:2.5
+        command:
+            - "--log.level=DEBUG"
+            - "--api.insecure=true"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+        ports:
+            - "80:80"
+            - "8080:8080"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        networks:
+            async-event-network:
+                ipv4_address: 192.168.100.2
+
+    mars:
+        image: ferror/symfony-image:8.0
+        command: ["make", "run"]
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.mars.rule=Host(`mars.universe.localhost`)"
+        volumes:
+            - ./mars:/app:delegated
+        depends_on:
+            - traefik
+        networks:
+            - async-event-network
+
+    jupiter:
+        image: ferror/symfony-image:8.0
+        command: ["make", "run"]
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.jupiter.rule=Host(`jupiter.universe.localhost`)"
+        volumes:
+            - ./jupiter:/app:delegated
+        depends_on:
+            - traefik
+        networks:
+            - async-event-network
+
+    saturn:
+        image: ferror/symfony-image:8.0
+        command: ["make", "run"]
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.saturn.rule=Host(`saturn.universe.localhost`)"
+        volumes:
+            - ./saturn:/app:delegated
+        depends_on:
+            - traefik
+        networks:
+            - async-event-network
+
+networks:
+    async-event-network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 192.168.100.0/24
