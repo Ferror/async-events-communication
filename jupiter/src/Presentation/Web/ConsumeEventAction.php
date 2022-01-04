@@ -3,23 +3,37 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web;
 
-use App\Application\EventBus;
+use App\Application\EventConsumer\MarsEventConsumer;
+use App\Application\EventConsumer\SaturnEventConsumer;
 use App\Domain\Event;
-use App\Framework\DependencyInjection;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ConsumeEventAction
 {
-    private EventBus $bus;
-
-    public function __construct(DependencyInjection $di)
+    public function __construct(
+        private LoggerInterface $logger,
+    )
     {
-        $this->bus = $di::get(EventBus::class);
     }
 
     #[Route(path: '/consume', methods: ['POST'])]
-    public function __invoke()
+    public function __invoke(Request $request): Response
     {
-        $this->bus->propagate(new Event('name'));
+        $body = json_decode($request->getContent(false), true, 512, JSON_THROW_ON_ERROR);
+        $event = Event::fromArray($body);
+        $this->logger->info('received event: ' . implode(', ', $event->toArray()));
+
+        if ($event->is('mars-event')) {
+            (new MarsEventConsumer($this->logger))($event);
+        }
+
+        if ($event->is('saturn-event')) {
+            (new SaturnEventConsumer($this->logger))($event);
+        }
+
+        return new Response('', 200);
     }
 }

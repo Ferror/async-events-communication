@@ -17,9 +17,9 @@ class PropagateEventAction
         $this->bus = $di::get(EventBus::class);
     }
 
-    #[Route(path: '/propagate', methods: ['POST'])]
+    #[Route(path: '/propagate', methods: ['GET'])]
     public function __invoke()
     {
-        $this->bus->propagate(new Event('name'));
+        $this->bus->propagate(new Event('jupiter-event'));
     }
 }
