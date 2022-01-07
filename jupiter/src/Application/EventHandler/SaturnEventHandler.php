@@ -6,7 +6,7 @@ namespace App\Application\EventConsumer;
 use App\Domain\Event;
 use Psr\Log\LoggerInterface;
 
-class MarsEventConsumer
+class SaturnEventHandler
 {
     public function __construct(
         private LoggerInterface $logger,

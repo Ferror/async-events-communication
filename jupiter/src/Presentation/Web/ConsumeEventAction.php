@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Web;
 
-use App\Application\EventConsumer\MarsEventConsumer;
-use App\Application\EventConsumer\SaturnEventConsumer;
+use App\Application\EventConsumer\MarsEventHandler;
+use App\Application\EventConsumer\SaturnEventHandler;
 use App\Domain\Event;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,11 +27,11 @@ class ConsumeEventAction
         $this->logger->info('received event: ' . implode(', ', $event->toArray()));
 
         if ($event->is('mars-event')) {
-            (new MarsEventConsumer($this->logger))($event);
+            (new MarsEventHandler($this->logger))($event);
         }
 
         if ($event->is('saturn-event')) {
-            (new SaturnEventConsumer($this->logger))($event);
+            (new SaturnEventHandler($this->logger))($event);
         }
 
         return new Response('', 200);

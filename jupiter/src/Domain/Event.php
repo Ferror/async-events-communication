@@ -7,22 +7,23 @@ class Event
 {
     public static function fromArray(array $data): Event
     {
-        return new self ($data['name']);
+        return new self($data['name']);
     }
 
     public function __construct(
         private string $name,
+        private array $data = [],
     )
     {
     }
 
-    public function is(string $name)
+    public function is(string $name): bool
     {
         return $this->name === $name;
     }
 
     public function toArray(): array
     {
-        return ['name' => $this->name];
+        return array_merge(['name' => $this->name], $this->data);
     }
 }
