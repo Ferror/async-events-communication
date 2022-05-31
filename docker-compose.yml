@@ -13,8 +13,7 @@ services:
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock:ro
         networks:
-            async-event-network:
-                ipv4_address: 192.168.100.2
+            - async-event-network
 
     mars:
         image: ferror/symfony-image:8.0
@@ -58,7 +57,3 @@ services:
 networks:
     async-event-network:
         driver: bridge
-        ipam:
-            driver: default
-            config:
-                - subnet: 192.168.100.0/24
